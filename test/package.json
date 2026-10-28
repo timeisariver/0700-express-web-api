@@ -1,0 +1,16 @@
+{
+  "name": "express-web-api-blackbox-tests",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  },
+  "license": "ISC",
+  "description": "Black-box API tests for the Express Web API assignment"
+}
