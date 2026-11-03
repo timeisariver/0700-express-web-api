@@ -8,11 +8,14 @@ import { createUser, findUserByEmail } from "../models/userModel";
 
 const BCRYPT_ROUNDS = 10;
 
+// email は小文字にそろえてから確かめ・保存・検索する（Test@Example.com と test@example.com を同じ人として扱う）
+const normalizedEmail = z.string().toLowerCase();
+
 const signupSchema = z
   .object({
     username: z.string().min(1),
-    email: z.email(),
-    email_confirmation: z.string().min(1),
+    email: normalizedEmail.pipe(z.email()),
+    email_confirmation: normalizedEmail.min(1),
     password: z.string().min(1),
     password_confirmation: z.string().min(1),
   })
@@ -20,7 +23,7 @@ const signupSchema = z
   .refine((body) => body.password === body.password_confirmation);
 
 const loginSchema = z.object({
-  email: z.string().min(1),
+  email: normalizedEmail.min(1),
   password: z.string().min(1),
 });
 
