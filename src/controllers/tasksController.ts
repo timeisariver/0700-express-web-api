@@ -1,8 +1,10 @@
 import type { RequestHandler } from "express";
 import { z } from "zod";
 import { TaskKind, TaskStatus } from "../generated/prisma/client";
-import { badRequest, notFound, unauthorized } from "../lib/httpError";
+import { badRequest, notFound } from "../lib/httpError";
 import { parsePagination, toPageInfo } from "../lib/pagination";
+import { parseOrThrow } from "../lib/validation";
+import { getUserId } from "../middlewares/requireAuth";
 import {
   createTask as createTaskRecord,
   deleteTask as deleteTaskRecord,
@@ -38,47 +40,36 @@ const listQuerySchema = z.object({
 const idSchema = z.uuid();
 
 // UUID の形でない ID は DB に問い合わせる前に 404 にする（DB の UUID 型に渡すと 500 になるため）
-const parseTaskId = (id: string): string => {
-  const parsed = idSchema.safeParse(id);
-  if (!parsed.success) throw notFound("Task not found");
-  return parsed.data;
-};
+const parseTaskId = (id: string): string =>
+  parseOrThrow(idSchema, id, () => notFound("Task not found"));
 
 const assertProjectUsable = async (userId: string, projectId: string): Promise<void> => {
   if (!(await projectBelongsToUser(userId, projectId))) throw badRequest();
 };
 
 export const listTasks: RequestHandler = async (req, res) => {
-  const userId = req.user?.id;
-  if (!userId) throw unauthorized();
+  const userId = getUserId(req);
 
   const pagination = parsePagination(req.query);
-  const parsed = listQuerySchema.safeParse({ status: req.query["status"] });
-  if (!parsed.success) throw badRequest();
+  const { status } = parseOrThrow(listQuerySchema, { status: req.query["status"] });
 
-  const { tasks, totalCount } = await findTasksByUser(userId, {
-    ...pagination,
-    status: parsed.data.status,
-  });
+  const { tasks, totalCount } = await findTasksByUser(userId, { ...pagination, status });
 
   res.status(200).json({ data: tasks, pageInfo: toPageInfo(totalCount, pagination) });
 };
 
 export const createTask: RequestHandler = async (req, res) => {
-  const userId = req.user?.id;
-  if (!userId) throw unauthorized();
+  const userId = getUserId(req);
 
-  const parsed = createTaskSchema.safeParse(req.body);
-  if (!parsed.success) throw badRequest();
-  await assertProjectUsable(userId, parsed.data.projectId);
+  const input = parseOrThrow(createTaskSchema, req.body);
+  await assertProjectUsable(userId, input.projectId);
 
-  const task = await createTaskRecord(userId, parsed.data);
+  const task = await createTaskRecord(userId, input);
   res.status(201).json({ data: task });
 };
 
 export const getTask: RequestHandler<{ id: string }> = async (req, res) => {
-  const userId = req.user?.id;
-  if (!userId) throw unauthorized();
+  const userId = getUserId(req);
 
   const task = await findTaskById(userId, parseTaskId(req.params.id));
   if (!task) throw notFound("Task not found");
@@ -87,28 +78,25 @@ export const getTask: RequestHandler<{ id: string }> = async (req, res) => {
 };
 
 export const updateTask: RequestHandler<{ id: string }> = async (req, res) => {
-  const userId = req.user?.id;
-  if (!userId) throw unauthorized();
+  const userId = getUserId(req);
 
   const id = parseTaskId(req.params.id);
   if (!(await findTaskById(userId, id))) throw notFound("Task not found");
 
-  const parsed = updateTaskSchema.safeParse(req.body);
-  if (!parsed.success) throw badRequest();
-  if (parsed.data.projectId !== undefined) {
-    await assertProjectUsable(userId, parsed.data.projectId);
+  const input = parseOrThrow(updateTaskSchema, req.body);
+  if (input.projectId !== undefined) {
+    await assertProjectUsable(userId, input.projectId);
   }
 
   // 送られなかった項目は undefined のまま渡す。Prisma は undefined の列を更新しないので、送られた項目だけが変わる
-  const task = await updateTaskRecord(userId, id, parsed.data);
+  const task = await updateTaskRecord(userId, id, input);
   if (!task) throw notFound("Task not found");
 
   res.status(200).json({ data: task });
 };
 
 export const deleteTask: RequestHandler<{ id: string }> = async (req, res) => {
-  const userId = req.user?.id;
-  if (!userId) throw unauthorized();
+  const userId = getUserId(req);
 
   const task = await deleteTaskRecord(userId, parseTaskId(req.params.id));
   if (!task) throw notFound("Task not found");

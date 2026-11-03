@@ -1,4 +1,4 @@
-import type { RequestHandler } from "express";
+import type { Request, RequestHandler } from "express";
 import { unauthorized } from "../lib/httpError";
 import { verifyAccessToken } from "../lib/jwt";
 
@@ -18,4 +18,10 @@ export const requireAuth: RequestHandler = (req, _res, next) => {
   } catch {
     next(unauthorized());
   }
+};
+
+// requireAuth を通ったあとのハンドラーで使う。付け忘れたルートでは 401 にする
+export const getUserId = (req: Request): string => {
+  if (!req.user) throw unauthorized();
+  return req.user.id;
 };

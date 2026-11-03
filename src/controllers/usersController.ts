@@ -1,10 +1,10 @@
 import type { RequestHandler } from "express";
 import { unauthorized } from "../lib/httpError";
+import { getUserId } from "../middlewares/requireAuth";
 import { findUserById } from "../models/userModel";
 
 export const getMe: RequestHandler = async (req, res) => {
-  const userId = req.user?.id;
-  if (!userId) throw unauthorized();
+  const userId = getUserId(req);
 
   // トークンは有効でも、ユーザーが消えている（Seed のやり直しなど）ことがある
   const user = await findUserById(userId);

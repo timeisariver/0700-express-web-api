@@ -2,8 +2,9 @@ import bcrypt from "bcryptjs";
 import type { RequestHandler } from "express";
 import { z } from "zod";
 import { Prisma } from "../generated/prisma/client";
-import { badRequest, conflict, unauthorized } from "../lib/httpError";
+import { conflict, unauthorized } from "../lib/httpError";
 import { signAccessToken, signRefreshToken } from "../lib/jwt";
+import { parseOrThrow } from "../lib/validation";
 import { createUser, findUserByEmail } from "../models/userModel";
 
 const BCRYPT_ROUNDS = 10;
@@ -37,9 +38,7 @@ const isUniqueConstraintError = (err: unknown): boolean =>
   err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002";
 
 export const signup: RequestHandler = async (req, res) => {
-  const parsed = signupSchema.safeParse(req.body);
-  if (!parsed.success) throw badRequest();
-  const { username, email, password } = parsed.data;
+  const { username, email, password } = parseOrThrow(signupSchema, req.body);
 
   // email の重複は 2 段階で止める。ここで先に検索するのは、重複のときに遅いハッシュ計算をせず 409 を返すため
   if (await findUserByEmail(email)) throw conflict("Email already exists");
@@ -56,9 +55,9 @@ export const signup: RequestHandler = async (req, res) => {
 };
 
 export const login: RequestHandler = async (req, res) => {
-  const parsed = loginSchema.safeParse(req.body);
-  if (!parsed.success) throw unauthorized("Invalid email or password");
-  const { email, password } = parsed.data;
+  const { email, password } = parseOrThrow(loginSchema, req.body, () =>
+    unauthorized("Invalid email or password"),
+  );
 
   const user = await findUserByEmail(email);
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
