@@ -11,10 +11,12 @@ const getSecret = (name: "JWT_SECRET" | "JWT_REFRESH_SECRET"): string => {
   return secret;
 };
 
-// 起動時に呼び、秘密鍵が無ければ例外で止める（リクエストの途中で 500 になるのを防ぐ）
+// 起動時に呼び、秘密鍵が無ければ例外で止める（リクエストの途中で 500 になるのを防ぐ）。
+// 2 つが同じ値だと、7 日もつリフレッシュトークンがアクセストークンとして通ってしまうので、それも止める
 export const assertJwtSecrets = (): void => {
-  getSecret("JWT_SECRET");
-  getSecret("JWT_REFRESH_SECRET");
+  if (getSecret("JWT_SECRET") === getSecret("JWT_REFRESH_SECRET")) {
+    throw new Error("JWT_SECRET and JWT_REFRESH_SECRET must be different");
+  }
 };
 
 export const signAccessToken = (userId: string): string =>
