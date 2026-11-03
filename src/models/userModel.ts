@@ -7,7 +7,6 @@ export const findUserByEmail = (email: string): Promise<User | null> =>
 export const findUserById = (id: string): Promise<User | null> =>
   prisma.user.findUnique({ where: { id } });
 
-// status は schema の既定値（active）になる
 export const createUser = (input: {
   username: string;
   email: string;

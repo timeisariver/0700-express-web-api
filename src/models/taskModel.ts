@@ -2,7 +2,6 @@ import type { Prisma, TaskKind, TaskStatus } from "../generated/prisma/client";
 import { prisma } from "../lib/prisma";
 import type { Pagination } from "../lib/pagination";
 
-// レスポンスに出す項目だけを取り出す（userId・projectId は出さない）
 const taskSelect = {
   id: true,
   title: true,
@@ -27,7 +26,7 @@ export type TaskCreateInput = {
   deadline: Date;
 };
 
-// 作成日時の昇順 → id の昇順。status を省略するとすべての status を返す
+// 作成日時が同じタスクがあっても順番が毎回同じになるよう、id も並び順に入れる（ページをまたいで重ならないため）
 export const findTasksByUser = async (
   userId: string,
   query: Pagination & { status?: TaskStatus },
@@ -56,7 +55,6 @@ export const findTaskById = (userId: string, id: string): Promise<TaskResponse |
 export const createTask = (userId: string, input: TaskCreateInput): Promise<TaskResponse> =>
   prisma.task.create({ data: { ...input, userId }, select: taskSelect });
 
-// 送られた項目だけを更新する。見つからなければ null
 export const updateTask = async (
   userId: string,
   id: string,
@@ -67,7 +65,6 @@ export const updateTask = async (
   return findTaskById(userId, id);
 };
 
-// 削除前の Task を返す。見つからなければ null
 export const deleteTask = async (userId: string, id: string): Promise<TaskResponse | null> => {
   const task = await findTaskById(userId, id);
   if (!task) return null;

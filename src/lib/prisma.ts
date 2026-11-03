@@ -4,5 +4,5 @@ import { PrismaClient } from "../generated/prisma/client";
 
 const adapter = new PrismaPg({ connectionString: process.env["DATABASE_URL"] });
 
-// log: ["query"] で実行した SQL を標準出力に出す
+// クエリログ（実行した SQL）を出すのは課題の要件なので、log: ["query"] を外さない
 export const prisma = new PrismaClient({ adapter, log: ["query"] });

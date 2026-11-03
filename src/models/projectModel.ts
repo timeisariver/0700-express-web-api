@@ -2,7 +2,6 @@ import type { Prisma } from "../generated/prisma/client";
 import { prisma } from "../lib/prisma";
 import type { Pagination } from "../lib/pagination";
 
-// レスポンスに出す項目だけを取り出す（userId は出さない）
 const projectSelect = {
   id: true,
   name: true,

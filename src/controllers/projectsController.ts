@@ -7,7 +7,6 @@ export const listProjects: RequestHandler = async (req, res) => {
   const userId = req.user?.id;
   if (!userId) throw unauthorized();
 
-  // limit・page が不正なら 400 を投げる
   const pagination = parsePagination(req.query);
   const { projects, totalCount } = await findProjectsByUser(userId, pagination);
 

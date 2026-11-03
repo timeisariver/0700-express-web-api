@@ -8,7 +8,6 @@ import {
 } from "../controllers/tasksController";
 import { requireAuth } from "../middlewares/requireAuth";
 
-// /users/tasks に mount する。すべてのルートで認証が要る
 export const tasksRouter: Router = Router();
 
 tasksRouter.use(requireAuth);

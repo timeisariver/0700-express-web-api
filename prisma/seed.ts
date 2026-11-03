@@ -20,7 +20,6 @@ const taskSeeds = [
 ] as const;
 
 const main = async (): Promise<void> => {
-  // 毎回、全件消してから入れ直す（タスク → プロジェクト → ユーザーの順）
   await prisma.task.deleteMany();
   await prisma.project.deleteMany();
   await prisma.user.deleteMany();

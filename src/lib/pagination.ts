@@ -15,7 +15,6 @@ const DEFAULT_LIMIT = 20;
 const DEFAULT_PAGE = 1;
 const MAX_LIMIT = 100;
 
-// 値が無ければ既定値。整数の文字列で min〜max に入れば数値。それ以外（配列も）は 400
 const parseIntParam = (
   value: unknown,
   defaultValue: number,

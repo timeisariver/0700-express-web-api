@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 const ACCESS_TOKEN_EXPIRES_IN = "1h";
 const REFRESH_TOKEN_EXPIRES_IN = "7d";
 
-// 秘密鍵は環境変数から読む。無ければ設定ミスなので例外にする
 const getSecret = (name: "JWT_SECRET" | "JWT_REFRESH_SECRET"): string => {
   const secret = process.env[name];
   if (!secret) {
@@ -30,7 +29,6 @@ export const signRefreshToken = (userId: string): string =>
     expiresIn: REFRESH_TOKEN_EXPIRES_IN,
   });
 
-// 署名・形式・期限のどれかが不正なら例外を投げる
 export const verifyAccessToken = (token: string): { userId: string } => {
   const payload = jwt.verify(token, getSecret("JWT_SECRET"), {
     algorithms: ["HS256"],

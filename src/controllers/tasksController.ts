@@ -28,7 +28,6 @@ const createTaskSchema = z.object({
   deadline: dateString,
 });
 
-// 更新は作成と同じ項目ですべて任意
 const updateTaskSchema = createTaskSchema.partial();
 
 // 配列（status=a&status=b）は文字列でないので 400 になる
@@ -45,7 +44,6 @@ const parseTaskId = (id: string): string => {
   return parsed.data;
 };
 
-// 存在しない・他のユーザーのプロジェクトは 400
 const assertProjectUsable = async (userId: string, projectId: string): Promise<void> => {
   if (!(await projectBelongsToUser(userId, projectId))) throw badRequest();
 };
@@ -54,7 +52,6 @@ export const listTasks: RequestHandler = async (req, res) => {
   const userId = req.user?.id;
   if (!userId) throw unauthorized();
 
-  // limit・page・status が不正なら 400 を投げる
   const pagination = parsePagination(req.query);
   const parsed = listQuerySchema.safeParse({ status: req.query["status"] });
   if (!parsed.success) throw badRequest();
@@ -93,7 +90,6 @@ export const updateTask: RequestHandler<{ id: string }> = async (req, res) => {
   const userId = req.user?.id;
   if (!userId) throw unauthorized();
 
-  // :id の 404 をボディの 400 より先に判定する
   const id = parseTaskId(req.params.id);
   if (!(await findTaskById(userId, id))) throw notFound("Task not found");
 
@@ -103,7 +99,7 @@ export const updateTask: RequestHandler<{ id: string }> = async (req, res) => {
     await assertProjectUsable(userId, parsed.data.projectId);
   }
 
-  // 送られなかった項目は undefined になり、Prisma はその列を更新しない
+  // 送られなかった項目は undefined のまま渡す。Prisma は undefined の列を更新しないので、送られた項目だけが変わる
   const task = await updateTaskRecord(userId, id, parsed.data);
   if (!task) throw notFound("Task not found");
 
