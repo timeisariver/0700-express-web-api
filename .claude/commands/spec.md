@@ -3,7 +3,7 @@ name: spec
 description: 短いアイデアから _specs/ の仕様書の下書きと、作業ブランチを作る。
 argument-hint: "<作りたい機能の説明>（例: タスクの作成 API / POST /users/tasks）"
 disable-model-invocation: true
-allowed-tools: Read, Write, Glob, Grep, Bash(git status:*), Bash(git switch:*), Bash(git branch:*), Bash(git rev-parse:*), Bash(git fetch:*), Bash(git diff:*), Bash(git ls-remote:*), Bash(curl -sL https://vws-api-spec-host.netlify.app/specs/yml:*)
+allowed-tools: Read, Write, Glob, Grep, Bash(git status:*), Bash(git switch:*), Bash(git branch:*), Bash(git rev-parse:*), Bash(git fetch:*), Bash(git diff:*), Bash(git ls-remote:*), Bash(curl -sL "https://vws-api-spec-host.netlify.app/specs/yml?id=express-web-api")
 ---
 
 `$ARGUMENTS` をもとに、仕様書の下書きと作業ブランチを作る。仕様書は人が見直して仕上げる前提で、ここでは下書きまでにする。

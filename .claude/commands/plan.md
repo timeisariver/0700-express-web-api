@@ -3,7 +3,7 @@ name: plan
 description: _specs/ の仕様書をもとに、タスク分割と担当範囲を決めた実装プランを _plans/ に書き出す。
 argument-hint: <仕様書のパス>
 disable-model-invocation: true
-allowed-tools: Read, Write, Glob, Grep, Bash(git status:*), Bash(git switch:*), Bash(git branch:*), Bash(git rev-parse:*), Bash(git fetch:*), Bash(git diff:*), Bash(curl -sL https://vws-api-spec-host.netlify.app/specs/yml:*)
+allowed-tools: Read, Write, Glob, Grep, Bash(git status:*), Bash(git switch:*), Bash(git branch:*), Bash(git rev-parse:*), Bash(git fetch:*), Bash(git diff:*), Bash(curl -sL "https://vws-api-spec-host.netlify.app/specs/yml?id=express-web-api")
 ---
 
 仕様書 `$ARGUMENTS` をもとに、実装プランを書く。プランは人が見直してから `/implement` に渡す前提で、ここでは実装しない。
@@ -18,7 +18,7 @@ allowed-tools: Read, Write, Glob, Grep, Bash(git status:*), Bash(git switch:*), 
 ## 2. 調べる
 
 - **既存の実装**: `package.json`、`tsconfig.json`、`docker-compose.yml`、`prisma/schema.prisma`、`prisma/seed.ts`、`src/**` を読み、流用できるもの（認証ミドルウェア、ページネーション、エラーレスポンス、バリデーション、ログ出力など）と変更が要るものを確かめる。
-- **プロジェクトの土台が無い場合**（`package.json` や `src/` がまだ無い）: Express + TypeScript + Prisma + PostgreSQL（Docker）の土台作りを第 1 段階のタスクに含める。`npm run dev`・`npm run db:seed` が使えること、サーバが `http://localhost:3000/api/v1` で動くこと、リクエストログとクエリログが出ることは `README.md` と `test/README.md` の前提なので、土台のタスクで満たす。
+- **プロジェクトの土台が無い場合**（`package.json` や `src/` がまだ無い）: Express + TypeScript + Prisma + PostgreSQL（Docker）の土台作りを第 1 段階のタスクに含める。`npm run dev`・`npm run db:seed` が使えること、サーバが `http://localhost:3000/api/v1` で動くこと、リクエストログとクエリログが出ることは `README.md` と `test/README.md` の前提なので、土台のタスクで満たす。ルートの `.gitignore` に、土台で増える生成物（Prisma の出力先など）が入っていなければ、土台のタスクで足す。
 - **API 仕様**: 仕様書の「リクエスト」「レスポンス」で足りない点があれば、`curl -sL "https://vws-api-spec-host.netlify.app/specs/yml?id=express-web-api"` で確かめる。API 仕様とテストが食い違う場合はテストを正とする。
 - **テスト**: 仕様書の要件に添えられた `test/tests/*.test.ts` と `test/tests/support/*.ts` を読み、レスポンスの形（`data`・`pageInfo` など）と Seed データの前提を確かめる。
 - **置き場所**: 既存のディレクトリ構成があればそれに従う。無ければ MVC で分ける（`src/routes`・`src/controllers`・`src/models`（Prisma を使うデータ操作）・`src/middlewares`・`src/lib`（共通処理）、DB は `prisma/`）。1 つのリソースでしか使わない処理は、今まさに複数箇所で使うまでは `src/lib` に切り出さない。
