@@ -54,7 +54,7 @@ _specs/express-web-api.md
   - `src/lib/pagination.ts`:
     - `type Pagination = { limit: number; page: number }`
     - `type PageInfo = { totalCount: number; limit: number; page: number; hasNext: boolean; hasPrevious: boolean }`
-    - `parsePagination(query: Request["query"]): Pagination`（既定 `limit=20`, `page=1`。`limit` が 1〜100 の整数でない、`page` が 1 以上の整数でない、配列で渡された、のどれかなら `badRequest()` を投げる）
+    - `parsePagination(query: Request["query"]): Pagination`（既定 `limit=20`, `page=1`。`limit` が 1〜100 の整数でない、`page` が 1〜1,000,000 の整数でない、配列で渡された、のどれかなら `badRequest()` を投げる）
     - `toPageInfo(totalCount: number, pagination: Pagination): PageInfo`（`hasNext = page * limit < totalCount`, `hasPrevious = page > 1`）
   - `src/middlewares/requireAuth.ts`: `requireAuth: RequestHandler`（`Authorization: Bearer <token>` を検証し、`req.user = { id: string }` を入れる。無い・不正なら `unauthorized()`）
   - `src/types/express.d.ts`: `Express.Request` に `user?: { id: string }` を足す

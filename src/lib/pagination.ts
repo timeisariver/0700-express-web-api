@@ -14,6 +14,8 @@ export type PageInfo = {
 const DEFAULT_LIMIT = 20;
 const DEFAULT_PAGE = 1;
 const MAX_LIMIT = 100;
+// 上限が無いと、飛ばす件数（(page - 1) * limit）が DB の扱える整数を超えて 500 になる
+const MAX_PAGE = 1_000_000;
 
 const parseIntParam = (
   value: unknown,
@@ -30,7 +32,7 @@ const parseIntParam = (
 
 export const parsePagination = (query: Request["query"]): Pagination => ({
   limit: parseIntParam(query["limit"], DEFAULT_LIMIT, 1, MAX_LIMIT),
-  page: parseIntParam(query["page"], DEFAULT_PAGE, 1, Number.MAX_SAFE_INTEGER),
+  page: parseIntParam(query["page"], DEFAULT_PAGE, 1, MAX_PAGE),
 });
 
 export const toPageInfo = (totalCount: number, pagination: Pagination): PageInfo => ({
