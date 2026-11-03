@@ -12,7 +12,13 @@ const getSecret = (name: "JWT_SECRET" | "JWT_REFRESH_SECRET"): string => {
   return secret;
 };
 
-export const signAccessToken = (userId: string): string =>
+// 起動時に呼び、秘密鍵が無ければ例外で止める（リクエストの途中で 500 になるのを防ぐ）
+export const assertJwtSecrets = (): void => {
+  getSecret("JWT_SECRET");
+  getSecret("JWT_REFRESH_SECRET");
+};
+
+export const signAccessToken =(userId: string): string =>
   jwt.sign({}, getSecret("JWT_SECRET"), {
     subject: userId,
     expiresIn: ACCESS_TOKEN_EXPIRES_IN,
