@@ -41,6 +41,7 @@ export const signup: RequestHandler = async (req, res) => {
   if (!parsed.success) throw badRequest();
   const { username, email, password } = parsed.data;
 
+  // email の重複は 2 段階で止める。ここで先に検索するのは、重複のときに遅いハッシュ計算をせず 409 を返すため
   if (await findUserByEmail(email)) throw conflict("Email already exists");
 
   const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
@@ -48,7 +49,7 @@ export const signup: RequestHandler = async (req, res) => {
     const user = await createUser({ username, email, passwordHash });
     res.status(200).json({ data: toAuthData(user.id) });
   } catch (err) {
-    // 同じ email の登録が同時に来たときは、ユニーク制約違反になる
+    // 同じ email の登録が同時に来ると上の検索をどちらも通り抜けるので、最後は DB のユニーク制約で止める
     if (isUniqueConstraintError(err)) throw conflict("Email already exists");
     throw err;
   }
