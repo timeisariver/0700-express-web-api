@@ -8,10 +8,11 @@ Express + TypeScript + Prisma + PostgreSQL（Docker）+ JWT で、課題の Web 
 
 - **`test/` は変更しない**。課題の判定用のテストで、実装がこれに合わせる。
 - **API 仕様とテストが食い違うときは、テストを正とする**（例: Task ID は UUID）。
+- **認証は `Authorization: Bearer <accessToken>` ヘッダーで受け取る**。Cookie は使わない。ログインと登録は、トークンをレスポンスの JSON（`data.accessToken`）で返す。
 - 仕様書の「要件」に書かれたことだけを実装し、「対象外」は作らない。
 - 秘密の値（JWT の秘密鍵、DB の接続文字列）はコードに書かず、環境変数から読む。`.env` はコミットしない。
 - コミットメッセージは `/cmt` のルールに従う（`<絵文字> <種類>: <日本語の要約>`）。
-- main に直接コミットしない。
+- main に直接コミットしない。作業は `/spec` が作る `feature/<slug>` ブランチで行う。
 
 ## よく使うコマンド
 
@@ -29,6 +30,7 @@ Express + TypeScript + Prisma + PostgreSQL（Docker）+ JWT で、課題の Web 
 | ---------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | 課題の要件・チェック項目を知りたい             | [README.md](README.md)                                                                       |
 | 開発の流れ（/spec → /plan → /implement → /pr） | [README.md の「Claude Code での開発の流れ」](README.md#claude-code-での開発の流れ)            |
+| 課題の API を一通り作る手順と確認項目          | [docs/implementation-checklist.md](docs/implementation-checklist.md)                         |
 | エンドポイントの形・Seed データ・テストの前提  | [test/README.md](test/README.md)、`test/tests/support/contracts.ts`                          |
 | API 仕様の原文                                 | `curl -sL "https://vws-api-spec-host.netlify.app/specs/yml?id=express-web-api"`              |
 | 仕様書・プランを書く                           | [_specs/_template.md](_specs/_template.md)、[_plans/_template.md](_plans/_template.md)        |
