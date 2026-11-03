@@ -1,0 +1,2 @@
+# 改行は OS に関係なく LF にそろえる（Windows の core.autocrlf=true による CRLF 変換を止める）
+* text=auto eol=lf
