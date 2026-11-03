@@ -41,12 +41,14 @@ export const signup: RequestHandler = async (req, res) => {
   if (!parsed.success) throw badRequest();
   const { username, email, password } = parsed.data;
 
+  if (await findUserByEmail(email)) throw conflict("Email already exists");
+
   const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
   try {
     const user = await createUser({ username, email, passwordHash });
     res.status(200).json({ data: toAuthData(user.id) });
   } catch (err) {
-    // email の重複は、事前に検索せず DB のユニーク制約で判定する（同時に登録が来ても確実に 409 になる）
+    // 同じ email の登録が同時に来たときは、ユニーク制約違反になる
     if (isUniqueConstraintError(err)) throw conflict("Email already exists");
     throw err;
   }
