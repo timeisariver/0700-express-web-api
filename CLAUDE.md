@@ -29,7 +29,7 @@ Express + TypeScript + Prisma + PostgreSQL（Docker）+ JWT で、課題の Web 
 | こんなときに                                   | 読むもの                                                                                     |
 | ---------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | 課題の要件・チェック項目を知りたい             | [README.md](README.md)                                                                       |
-| 開発の流れ（/spec → /plan → /implement → /pr） | [README.md の「Claude Code での開発の流れ」](README.md#claude-code-での開発の流れ)            |
+| 開発の流れ（/spec → /plan → /implement → /pr） | [docs/claude-code-workflow.md](docs/claude-code-workflow.md)                                 |
 | 課題の API を一通り作る手順と確認項目          | [docs/implementation-checklist.md](docs/implementation-checklist.md)                         |
 | エンドポイントの形・Seed データ・テストの前提  | [test/README.md](test/README.md)、`test/tests/support/contracts.ts`                          |
 | API 仕様の原文                                 | `curl -sL "https://vws-api-spec-host.netlify.app/specs/yml?id=express-web-api"`              |
