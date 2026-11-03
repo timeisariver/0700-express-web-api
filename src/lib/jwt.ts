@@ -17,7 +17,7 @@ export const assertJwtSecrets = (): void => {
   getSecret("JWT_REFRESH_SECRET");
 };
 
-export const signAccessToken =(userId: string): string =>
+export const signAccessToken = (userId: string): string =>
   jwt.sign({}, getSecret("JWT_SECRET"), {
     subject: userId,
     expiresIn: ACCESS_TOKEN_EXPIRES_IN,
