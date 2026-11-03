@@ -12,10 +12,10 @@ import {
   updateTask as updateTaskRecord,
 } from "../models/taskModel";
 
-// new Date(value) で読める文字列（2024-12-31 や ISO 8601 の日時）だけを受け付け、Date にする
+// 日付（2024-12-31）か、タイムゾーン付きの ISO 8601 の日時（2024-12-31T09:00:00Z、+09:00 など）だけを受け付け、Date にする。
+// 2024-02-31 のような存在しない日付や、タイムゾーンの無い日時（サーバーの時刻で解釈されてしまう）は 400
 const dateString = z
-  .string()
-  .refine((value) => !Number.isNaN(new Date(value).getTime()))
+  .union([z.iso.date(), z.iso.datetime({ offset: true })])
   .transform((value) => new Date(value));
 
 const createTaskSchema = z.object({
