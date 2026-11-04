@@ -17,3 +17,6 @@ coverage/
 # OS・エディタ
 .DS_Store
 Thumbs.db
+
+# Prisma の生成物（npm install の postinstall で作る）
+src/generated/
